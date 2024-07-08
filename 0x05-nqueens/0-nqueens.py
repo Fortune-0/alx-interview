@@ -1,60 +1,62 @@
 #!/usr/bin/python3
-"""N-Queens"""
+"""N Queens placement on NxN chessboard"""
 
 import sys
 
 
-def is_safe(board, row, col):
-    """Check if it's safe to place a queen at board[row][col]"""
-    for i in range(row):
-        if board[i] == col or \
-           board[i] - i == col - row or \
-           board[i] + i == col + row:
+def generate_solutions(n):
+    """Generate all possible solutions for n queens on an n x n board"""
+    solutions = [[]]
+    for queen in range(n):
+        solutions = place_queen(queen, n, solutions)
+    return solutions
+
+
+def place_queen(queen, n, prev_solutions):
+    """Place a queen in a valid position"""
+    safe_positions = []
+    for solution in prev_solutions:
+        for col in range(n):
+            if is_safe(queen, col, solution):
+                safe_positions.append(solution + [col])
+    return safe_positions
+
+
+def is_safe(row, col, solution):
+    """Check if a position is safe for the queen"""
+    for r in range(row):
+        c = solution[r]
+        if c == col or abs(c - col) == abs(r - row):
             return False
     return True
 
 
-def solve_nqueens(N):
-    """Solve the N-Queens puzzle and print all solutions"""
-    def backtrack(row):
-        if row == N:
-            solutions.append(board[:])
-            return
-        for col in range(N):
-            if is_safe(board, row, col):
-                board[row] = col
-                backtrack(row + 1)
-
-    solutions = []
-    board = [-1] * N
-    backtrack(0)
-    return solutions
-
-
-def print_solutions(solutions):
-    """Print solutions in the required format"""
-    for solution in solutions:
-        print([[i, solution[i]] for i in range(len(solution))])
-
-
-def main():
+def init():
+    """Initialize and validate command-line arguments"""
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
-
-    try:
-        N = int(sys.argv[1])
-    except ValueError:
+    if sys.argv[1].isdigit():
+        n = int(sys.argv[1])
+    else:
         print("N must be a number")
         sys.exit(1)
-
-    if N < 4:
+    if n < 4:
         print("N must be at least 4")
         sys.exit(1)
-
-    solutions = solve_nqueens(N)
-    print_solutions(solutions)
+    return n
 
 
-if __name__ == "__main__":
-    main()
+def n_queens():
+    """Solve the N Queens problem and print all solutions"""
+    n = init()
+    solutions = generate_solutions(n)
+    for solution in solutions:
+        result = []
+        for row, col in enumerate(solution):
+            result.append([row, col])
+        print(result)
+
+
+if __name__ == '__main__':
+    n_queens()
