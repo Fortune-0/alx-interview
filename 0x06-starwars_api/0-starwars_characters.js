@@ -1,42 +1,27 @@
 #!/usr/bin/node
-// Import the necessary modules
+
 const request = require('request');
 
-function requestSync (url) {
-  return new Promise((resolve, reject) => {
-    request(url, (error, response, body) => {
+const movieId = process.argv[2];
+const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
+
+request(apiUrl, (error, response, body) => {
+  if (error) {
+    console.error('Error fetching movie:', error);
+    return;
+  }
+
+  const data = JSON.parse(body);
+  const characters = data.characters;
+
+  characters.forEach(url => {
+    request(url, (error, response, body) => { // Changed response to request
       if (error) {
-        reject(error);
-      } else {
-        resolve({ response, body });
+        console.error('Error fetching character:', error);
+        return;
       }
+      const characterData = JSON.parse(body);
+      console.log(characterData.name);
     });
   });
-}
-
-async function fetchMovieData (movieId) {
-  try {
-    const movieUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
-
-    const { response, body } = await requestSync(movieUrl);
-
-    if (response.statusCode === 200) {
-      const movieData = JSON.parse(body);
-      const characters = movieData.characters;
-
-      for (const url of characters) {
-        const { response: charResponse, body: charBody } = await requestSync(url);
-        if (charResponse.statusCode === 200) {
-          const characterData = JSON.parse(charBody);
-          console.log(characterData.name);
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-}
-
-const movieId = process.argv[2];
-
-fetchMovieData(movieId);
+});
