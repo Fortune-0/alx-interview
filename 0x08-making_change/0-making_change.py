@@ -1,3 +1,9 @@
+#!/usr/bin/python3
+"""
+Make change task
+"""
+
+
 def makeChange(coins, total):
     """
     Finds the minimum number of coins to make a given amount of change.
@@ -10,9 +16,9 @@ def makeChange(coins, total):
         The minimum number of coins needed, or -1 if not possible.
     """
     # Sort the coins in descending order
-    
+
     if total <= 0:
-      return 0
+        return 0
     # coins.sort(reverse=True)
     # coins_need = 0;
     # for coin in coins:
@@ -29,7 +35,8 @@ def makeChange(coins, total):
     for current_amount in range(1, total + 1):
         for coin in coins:
             if coin <= current_amount:
-                dp[current_amount] = min(dp[current_amount], dp[current_amount - coin] + 1)
+                dp[current_amount] = min(dp[current_amount],
+                                         dp[current_amount - coin] + 1)
 
     # Check the result
     return dp[total] if dp[total] <= total else -1
